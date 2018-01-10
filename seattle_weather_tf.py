@@ -3,59 +3,12 @@ import numpy as np
 import keras, math
 import tensorflow as tf
 from sklearn.preprocessing import LabelBinarizer
+from seattle_weather_helper import get_data, accuracy
 
-data_dir = '/Users/dylanrutter/Downloads/seattleweather.csv'
 save_file = '/tmp/model.ckpt'
 weight_file = 'mine'
 
-def get_data():
-    """
-    Retrieves the dataframe from source location. Replaces "DATE" category
-    with either 0, indicating the date was during the spring season, 1,
-    indicating summer, 2, indicating fall, 3, indicating winter, or 4,
-    indicating an invalid date or no date was entered. Also replaces the
-    boolean "RAIN" column with floating point 0.0 or 1.0. Returns a
-    numpy array for features, a numpy array for labels, and a
-    one hot array for labels
-    """
-    df = pd.read_csv(data_dir)
-    df.dropna()
-    date = np.array((df.pop('DATE')))
-    season = []
-
-    spring = ['03', '04', '05']
-    summer = ['06', '07', '08']
-    fall = ['09', '10', '11']
-    winter = ['12', '01', '02']
-    
-    for e in date:
-        month = e[5:7]
-
-        if month in spring: season.append(0)
-        elif month in summer: season.append(1)
-        elif month in fall: season.append(2)
-        elif month in winter: season.append(3)
-        else: season.append(4)
-    
-    season = pd.Series(season)
-    df["SEASON"] = season
-
-    labels = np.asarray(df['RAIN'], dtype="|S6")
-    one_hot = LabelBinarizer()
-    df.pop('RAIN')
-     
-    return df.as_matrix(), labels, one_hot.fit_transform(labels)
-
-def accuracy(predictions, labels):
-    """
-    determines accuracy
-    """
-    return (100.0 * np.sum(np.argmax(predictions, 1) == np.argmax(labels, 1))
-            / predictions.shape[0])
-
-
 features, labels, one_hot = get_data()
-features = features.astype(np.float32)
 X_train,X_valid,X_test = features[:20000],features[20001:22000],features[22001:]
 y_train, y_valid, y_test = one_hot[:20000],one_hot[20001:22000],one_hot[22001:]
 
