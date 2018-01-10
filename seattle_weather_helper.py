@@ -15,9 +15,15 @@ def get_data():
     one hot array for labels
     """
     df = pd.read_csv(data_dir)
-    date = np.array((df.pop('DATE')))
-    season = []
-
+    df.drop(df.index[[21067, 18416, 18415]], inplace=True)
+    
+    date = df.pop('DATE')
+    prcp = df.pop('PRCP')
+    tmax = df.pop('TMAX')
+    tmin = df.pop('TMIN')
+    rain = df.pop('RAIN')
+                   
+    season = []    
     spring = ['03', '04', '05']
     summer = ['06', '07', '08']
     fall = ['09', '10', '11']
@@ -25,21 +31,26 @@ def get_data():
     
     for e in date:
         month = e[5:7]
-
         if month in spring: season.append(0)
         elif month in summer: season.append(1)
         elif month in fall: season.append(2)
         elif month in winter: season.append(3)
         else: season.append(4)
     
-    season = pd.Series(season)
-    df["SEASON"] = season
-
-    label = np.asarray(df['RAIN'], dtype="|S6")
+    data = {'PRCP':list(prcp),
+            'TMAX':list(tmax),
+            'TMIN':list(tmin),
+            "SEASON":season}
+    
+    new_df = pd.DataFrame(data=data, dtype=np.float32)
+    labels = np.array(rain).astype(np.float32)
+    features = new_df.as_matrix().astype(np.float32)
     one_hot = LabelBinarizer()
-    df.pop('RAIN')
-    df.dropna(axis=1, how='any')
-    return df.as_matrix().astype(np.float32),label,one_hot.fit_transform(label)
+    bad_indices = np.where(np.isnan(features))
+    if bad_indices:
+        print bad_indices
+    
+    return features, labels, one_hot.fit_transform(labels)
 
 def accuracy(predictions, labels):
     """
@@ -47,4 +58,5 @@ def accuracy(predictions, labels):
     """
     return (100.0 * np.sum(np.argmax(predictions, 1) == np.argmax(labels, 1))
             / predictions.shape[0])
+
 
