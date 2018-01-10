@@ -3,7 +3,7 @@ import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
 import warnings
-from sklearn.cross_validation import StratifiedShuffleSplit
+
 from sklearn.metrics import accuracy_score, log_loss
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.svm import SVC, LinearSVC, NuSVC
@@ -16,14 +16,18 @@ from sklearn.discriminant_analysis import QuadraticDiscriminantAnalysis
 from seattle_weather_helper import get_data, accuracy
 
 features, labels, one_hot = get_data()
-print np.any(np.isnan(features)) + 'is nan features'
-print np.all(np.isfinite(features)) + 'is finite features'
-print np.any(np.isnan(labels)) + 'is nan labels'
-print np.all(np.isfinite(labels)) + 'is finite labels'
-
+assert np.any(np.isnan(features)) == False
+print 'no isnan features'
+assert np.all(np.isfinite(features)) == True
+print 'no infinite features'
+assert np.any(np.isnan(labels)) == False
+print 'no isnan labels'
+assert np.all(np.isfinite(labels)) == True
+print 'no infinite labels'
 
 X_train, X_test = features[:20000], features[20001:]
 y_train, y_test = labels[:20000], labels[20001:]
+
 
 classifiers = [
     KNeighborsClassifier(3),
@@ -33,9 +37,7 @@ classifiers = [
     RandomForestClassifier(),
     AdaBoostClassifier(),
     GradientBoostingClassifier(),
-    GaussianNB(),
-    LinearDiscriminantAnalysis(),
-    QuadraticDiscriminantAnalysis()]
+    GaussianNB()]
 
 # Logging for Visual Comparison
 log_cols=["Classifier", "Accuracy", "Log Loss"]
@@ -44,7 +46,8 @@ log = pd.DataFrame(columns=log_cols)
 for clf in classifiers:
     clf.fit(X_train, y_train)
     name = clf.__class__.__name__
-    
+    pass
+   
     print("="*30)
     print(name)
     
@@ -89,3 +92,5 @@ submission.reset_index()
 # Export Submission
 #submission.to_csv('submission.csv', index = False)
 submission.tail()
+
+
