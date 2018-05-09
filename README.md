@@ -1,6 +1,6 @@
 # Seattle-Weather
 Analyzing Seattle weather patterns to predict the probability of rain on any given day.
-Used several different machine learning methods. 
+Compared multiple different machine learning models. Also applied deep learning.
 
 seattle_weather_helper.py unpacks data. 
 you will need to change line 5 variable data_dir = '/Users/dylanrutter/Downloads/seattleweather.csv' to fit your own save path 
